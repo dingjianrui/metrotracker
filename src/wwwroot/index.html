@@ -1,0 +1,198 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>无锡地铁施工地图管理</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/Site.css">
+    <style>
+        #floating-panel {
+            position: absolute;
+            top: 50px;
+            left: 1150px;
+            z-index: 5;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #999;
+            text-align: center;
+            font-family: 'Roboto', 'sans-serif';
+            line-height: 20px;
+            padding-left: 10px;
+        }
+
+        #floating-panel {
+            margin-left: -52px;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">无锡项目地图</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">主页</a></li>
+                <li><a href="/About.html">关于</a></li>
+                <li><a href="/Contact.html">联系方式</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+
+<script>
+    var map;
+    var src = 'http://wuxi.azurewebsites.net/line3.kml';
+    var labels = 'ABCDEFGHIJKLMN';
+    var labelIndex = 0;
+    var gmarker;
+    var infowindow;
+    var apiurl = 'http://geowebapi.azurewebsites.net/Api/';
+
+    //* Initializes the map and calls the function that creates polylines.
+
+    function initialize() {
+        map = new google.maps.Map(document.getElementById('googleMap'), {
+            center: new google.maps.LatLng(31.546941, 120.331878),
+            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.TERRAIN
+        });
+
+        loadKmlLayer(src, map);
+
+        var html = "<table>" +
+                "<tr><td>Name:</td> <td><input type='text' id='name'/> </td> </tr>" +
+                "<tr><td>Comments:</td> <td><input type='text' id='Comments'/></td> </tr>" +
+                "<tr><td>Type:</td> <td><select id='type'>" +
+                "<option value='start' SELECTED>start</option>" +
+                "<option value='point'>point</option>" +
+                "<option value='end'>end</option>" +
+                "</select> </td></tr>" +
+                "<tr><td></td><td><input type='button' value='Save & Close' onclick='SaveMarker()'/></td></tr>";
+        infowindow = new google.maps.InfoWindow({
+            content: html
+        });
+
+        //loadKmlLayer(markersrc, map);
+
+        // This event listener calls addMarker() when the map is clicked.
+        google.maps.event.addListener(map, 'click', function (event) {
+            addMarker(event.latLng, map, labels[labelIndex++ % labels.length]);
+
+            google.maps.event.addListener(gmarker, "click", function () {
+                infowindow.open(map, gmarker);
+            });
+        });
+
+        loadPlacemark(map);
+    }
+
+    function loadKmlLayer(src, map) {
+        var kmlLayer = new google.maps.KmlLayer(src, {
+            //suppressInfoWindows: true,
+            preserveViewport: true,
+            map: map
+        });
+        //google.maps.event.addListener(kmlLayer, 'click', function(event) {
+        //  var content = event.featureData.infoWindowHtml;
+        //  var testimonial = document.getElementById('capture');
+        //  testimonial.innerHTML = content;
+        //});
+    }
+
+    function loadPlacemark(map) {
+        $.ajax({
+            url: apiurl+ "Tags",
+            type: "GET",
+            dataType: "json",
+            //crossDomain: true,
+            //data: "{}",
+            cache: false,
+            success: function (data) {
+                $.each(data, function (key, item) {
+                    var latlng = {lat: item.Lat, lng: item.Lng};
+                    addMarker(latlng, map, item.Comments);
+                });
+            },
+            error: function (e) {
+                alert("not good" + JSON.stringify(e));
+            }
+        });
+    }
+
+    // Adds a marker to the map.
+    function addMarker(location, map, label) {
+        // Add the marker at the clicked location, and add the next-available label
+        // from the array of alphabetical characters.
+        gmarker = new google.maps.Marker({
+            position: location,
+            label: label,
+            title: label,
+            map: map
+        });
+    }
+
+    function getContentString(label, comment) {
+        var contentString = '';
+        return contentString;
+    }
+
+    function SaveMarker() {
+        var latlng = gmarker.getPosition();
+        var tag = {
+            Name: document.getElementById("name").value,
+            Comments: document.getElementById("Comments").value,
+            Lat: latlng.lat(),
+            Lng: latlng.lng(),
+            index: 0
+        };
+
+        $.ajax({
+            url: apiurl + 'Add',
+            type: 'POST',
+            data: tag,
+            contentType: 'application/json',
+            success: function (data) {
+                alert("添加成功");
+                infowindow.close();
+            },
+            error: function (e) {
+                alert("出错啦");
+            }
+        });
+    }
+
+    function reset() {
+        map.setCenter(new google.maps.LatLng(31.546941, 120.331878));
+        map.setZoom(12);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+<div class="container body-content">
+    <div class="row">
+        <div id="floating-panel">
+            <button id="reset" onclick="reset()">回到中心</button>
+        </div>
+        <div id="googleMap" style="width:1150px;height:550px;"></div>
+        <div id="capture"></div>
+    </div>
+    <hr/>
+</div>
+</body>
+</html>
