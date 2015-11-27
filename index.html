@@ -10,8 +10,8 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
 
-    <link rel="stylesheet" href="src/wwwroot/css/bootstrap.min.css">
-    <link rel="stylesheet" href="src/wwwroot/css/Site.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/Site.css">
     <style>
         #floating-panel {
             position: absolute;
@@ -63,6 +63,7 @@
     var gmarker;
     var infowindow;
     var apiurl = 'http://geowebapi.azurewebsites.net/Api/';
+    //apiurl = 'http://localhost:3790/Api/';
 
     //* Initializes the map and calls the function that creates polylines.
 
@@ -159,20 +160,20 @@
             Comments: document.getElementById("Comments").value,
             Lat: latlng.lat(),
             Lng: latlng.lng(),
-            index: 0
+            UserId: 0
         };
 
         $.ajax({
-            url: apiurl + 'Add',
+            url: apiurl + 'Tags',
             type: 'POST',
-            data: tag,
+            data: JSON.stringify(tag),
             contentType: 'application/json',
             success: function (data) {
                 alert("添加成功");
                 infowindow.close();
             },
             error: function (e) {
-                alert("出错啦");
+                alert("not good" + JSON.stringify(e));
             }
         });
     }
