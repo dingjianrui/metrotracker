@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>无锡地铁施工地图管理登录</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/Site.css">
+<!--    <link rel="stylesheet" href="css/style_log.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/userpanel.css">
+    <link rel="stylesheet" href="css/jquery.ui.all.css">-->
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+    <script src="js/knockout-3.2.0.debug.js"></script>
+    <script src="js/app.js" defer="defer"></script>
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">无锡项目地图</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">主页</a></li>
+                <li><a href="About.html">关于</a></li>
+                <li><a href="Contact.html">联系方式</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container body-content">
+    <div class="row">
+        <h3>Log In</h3>
+        <hr/>
+        <div class="table">
+            <div class="form-group">
+                <label>用户名：</label>
+                <input class="form-control" type="text" data-bind="value: loginEmail"/>
+            </div>
+            <div class="form-group">
+                <label>密码：</label>
+                <input class="form-control" type="password" data-bind="value: loginPassword"/>
+            </div>
+            <div class="form-group">
+                <button data-bind="click: login" class="btn btn-default">Log In</button>
+                <button data-bind="click: logout" class="btn btn-default">Log Out</button>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="login_boder">
+
+        <div class="login_padding" id="login_model">
+
+            <h2>USERNAME</h2>
+            <label>
+                <input type="text" id="username" class="txt_input txt_input2" onfocus="if (value =='Your name'){value =''}" onblur="if (value ==''){value='Your name'}" value="Your name">
+            </label>
+            <h2>PASSWORD</h2>
+            <label>
+                <input type="password" name="textfield2" id="userpwd" class="txt_input" onfocus="if (value =='******'){value =''}" onblur="if (value ==''){value='******'}" value="******">
+            </label>
+
+
+
+
+            <p class="forgot"><a id="iforget" href="javascript:void(0);">Forgot your password?</a></p>
+            <div class="rem_sub">
+                <div class="rem_sub_l">
+                    <input type="checkbox" name="checkbox" id="save_me">
+                    <label for="checkbox">Remember me</label>
+                </div>
+                <label>
+                    <input type="submit" class="sub_button" name="button" id="button" value="SIGN-IN" style="opacity: 0.7;">
+                </label>
+            </div>
+        </div>
+
+        <div class="copyrights">Collect from <a href="http://www.cssmoban.com/">企业网站模板</a></div>
+
+        <div id="forget_model" class="login_padding" style="display:none">
+            <br>
+
+            <h1>Forgot password</h1>
+            <br>
+            <div class="forget_model_h2">(Please enter your registered email below and the system will automatically reset users’ password and send it to user’s registered email address.)</div>
+            <label>
+                <input type="text" id="usrmail" class="txt_input txt_input2">
+            </label>
+
+
+            <div class="rem_sub">
+                <div class="rem_sub_l">
+                </div>
+                <label>
+                    <input type="submit" class="sub_buttons" name="button" id="Retrievenow" value="Retrieve now" style="opacity: 0.7;">
+                    　　　
+                    <input type="submit" class="sub_button" name="button" id="denglou" value="Return" style="opacity: 0.7;">　　
+
+                </label>
+            </div>
+        </div>
+
+
+
+
+
+
+        &lt;!&ndash;login_padding  Sign up end&ndash;&gt;
+    </div>-->
+</div>
+</body>
+</html>
