@@ -3,6 +3,8 @@
  */
 function ViewModel() {
     var self = this;
+    var apiUrl = 'http://geowebapi.azurewebsites.net';
+    apiUrl = 'http://localhost:3790';
 
     var tokenKey = 'accessToken';
 
@@ -13,8 +15,31 @@ function ViewModel() {
     self.registerPassword = ko.observable();
     self.registerPassword2 = ko.observable();
 
-    self.loginEmail = ko.observable();
-    self.loginPassword = ko.observable();
+
+
+    if($.cookie('mt_userName')!=undefined){
+        $("#rememberMe").attr("checked", true);
+        //read cookie
+        self.loginEmail = ko.observable($.cookie('mt_userName'));
+        self.loginPassword = ko.observable($.cookie('mt_password'));
+        self.rememberMe = ko.observable('checked');
+    }else{
+        $("#rememberMe").attr("checked", false);
+        self.loginEmail = ko.observable();
+        self.loginPassword = ko.observable();
+        self.rememberMe = ko.observable();
+    }
+
+    //remember me event
+    $("#rememberMe").click(function(){
+        if($('#rememberMe:checked').length>0){//set cookie
+            $.cookie('mt_userName', $('#username').val());
+            $.cookie('mt_password', $('#password').val());
+        }else{//clear cookie
+            $.removeCookie('mt_userName');
+            $.removeCookie('mt_password');
+        }
+    });
 
     function showError(jqXHR) {
         self.result(jqXHR.status + ': ' + jqXHR.statusText);
@@ -49,7 +74,7 @@ function ViewModel() {
 
         $.ajax({
             type: 'POST',
-            url: '/api/Account/Register',
+            url: apiUrl+'/api/Account/Register',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(data)
         }).done(function (data) {
@@ -68,12 +93,13 @@ function ViewModel() {
 
         $.ajax({
             type: 'POST',
-            url: 'https://localhost:44305/Token',
+            url: apiUrl+'/Token',
             data: loginData
         }).done(function (data) {
             self.user(data.userName);
             // Cache the access token in session storage.
             sessionStorage.setItem(tokenKey, data.access_token);
+            window.location.href = "index.html";
         }).fail(showError);
     }
 

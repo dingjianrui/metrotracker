@@ -42,7 +42,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">无锡项目地图</a>
+            <a class="navbar-brand" href="/">无锡地铁地图</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -63,6 +63,7 @@
     </div>
     <hr/>
 </div>
+<script src="js/app.js" defer="defer"></script>
 <script>
     var map;
     var markers = [];
@@ -253,11 +254,18 @@
             CreateDate: "2015-11-29T11:06:37.763"
         };
 
+        var token = sessionStorage.getItem(tokenKey);
+        var headers = {};
+        if (token) {
+            headers.Authorization = 'Bearer ' + token;
+        }
+
         $.ajax({
             url: apiurl + 'Tags/' + tagId,
             type: 'PUT',
             data: JSON.stringify(tag),
             contentType: 'application/json',
+            headers: headers,
             success: function (data) {
                 alert("更新成功");
                 marker.setLabel(tag.Name);
