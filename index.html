@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>无锡地铁施工地图管理</title>
+    <title>地铁施工地图管理</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -42,14 +42,16 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">无锡地铁地图</a>
+            <a class="navbar-brand" href="/">地铁地图</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="index.html">主页</a></li>
                 <li><a href="About.html">关于</a></li>
                 <li><a href="Contact.html">联系方式</a></li>
+                <li class="top-right"><a id="logout" onclick="logout()">退出</a></li>
             </ul>
+
         </div>
     </div>
 </div>
@@ -63,18 +65,27 @@
     </div>
     <hr/>
 </div>
-<script src="js/app.js" defer="defer"></script>
 <script>
     var map;
     var markers = [];
     var src = 'http://wuxi.azurewebsites.net/line3.kml';
     var tagIndex = 0;
-    var apiurl = 'http://geowebapi.azurewebsites.net/Api/';
+    var apiurl = 'http://securedwebapi.azurewebsites.net/';
     //apiurl = 'http://localhost:3790/Api/';
 
     //* Initializes the map and calls the function that creates polylines.
-
+    var tokenKey = 'accessToken';
+    var headers = {};
     function initialize() {
+
+        var token = sessionStorage.getItem(tokenKey);
+        if (token) {
+            headers.Authorization = 'Bearer ' + token;
+        }
+        else {
+            window.location.href = "login.html";
+        }
+
         map = new google.maps.Map(document.getElementById('googleMap'), {
             center: new google.maps.LatLng(31.546941, 120.331878),
             zoom: 12,
@@ -93,6 +104,11 @@
         loadPlacemarks(map);
     }
 
+    function logout(){
+        sessionStorage.removeItem(tokenKey);
+        window.location.href = "login.html";
+    }
+
     function loadKmlLayer(src, map) {
         var kmlLayer = new google.maps.KmlLayer(src, {
             //suppressInfoWindows: true,
@@ -108,9 +124,10 @@
 
     function loadPlacemarks(map) {
         $.ajax({
-            url: apiurl + "Tags",
+            url: apiurl + "/Api/Tags",
             type: "GET",
             dataType: "json",
+            headers: headers,
             //crossDomain: true,
             //data: "{}",
             cache: false,
@@ -254,14 +271,9 @@
             CreateDate: "2015-11-29T11:06:37.763"
         };
 
-        var token = sessionStorage.getItem(tokenKey);
-        var headers = {};
-        if (token) {
-            headers.Authorization = 'Bearer ' + token;
-        }
 
         $.ajax({
-            url: apiurl + 'Tags/' + tagId,
+            url: apiurl + '/Api/Tags/' + tagId,
             type: 'PUT',
             data: JSON.stringify(tag),
             contentType: 'application/json',
@@ -295,9 +307,10 @@
             };
 
             $.ajax({
-                url: apiurl + 'Tags',
+                url: apiurl + '/Api/Tags',
                 type: 'POST',
                 data: JSON.stringify(tag),
+                headers: headers,
                 contentType: 'application/json',
                 success: function (data) {
                     alert("添加成功");
@@ -333,8 +346,9 @@
 
         if (id != null && $.isNumeric(id)) {
             $.ajax({
-                url: apiurl + 'Tags/' + id,
+                url: apiurl + '/Api/Tags/' + id,
                 type: 'DELETE',
+                headers: headers,
                 success: function (data) {
                     alert("删除成功");
                 },

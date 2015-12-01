@@ -3,8 +3,8 @@
  */
 function ViewModel() {
     var self = this;
-    var apiUrl = 'http://geowebapi.azurewebsites.net';
-    apiUrl = 'http://localhost:3790';
+    var apiUrl = 'http://securedwebapi.azurewebsites.net';
+    //apiUrl = 'http://localhost:3790';
 
     var tokenKey = 'accessToken';
 
@@ -78,7 +78,9 @@ function ViewModel() {
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify(data)
         }).done(function (data) {
-            self.result("Done!");
+            self.loginEmail = ko.observable(self.registerEmail());
+            self.loginPassword = ko.observable(self.registerPassword());
+            self.login();
         }).fail(showError);
     }
 
@@ -91,10 +93,15 @@ function ViewModel() {
             password: self.loginPassword()
         };
 
+        //var headers1 = {'Access-Control-Allow-Origin: *'};
+        //headers.Authorization = 'Bearer ' + token;
+
         $.ajax({
             type: 'POST',
             url: apiUrl+'/Token',
-            data: loginData
+            data: loginData,
+            crossDomain: true
+            //headers: headers1//('Access-Control-Allow-Origin: *')
         }).done(function (data) {
             self.user(data.userName);
             // Cache the access token in session storage.
