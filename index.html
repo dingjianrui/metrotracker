@@ -13,25 +13,9 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/Site.css">
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
-    <style>
-        #floating-panel {
-            position: absolute;
-            top: 50px;
-            left: 1150px;
-            z-index: 5;
-            background-color: #fff;
-            padding: 5px;
-            border: 1px solid #999;
-            text-align: center;
-            font-family: 'Roboto', 'sans-serif';
-            line-height: 20px;
-            padding-left: 10px;
-        }
-
-        #floating-panel {
-            margin-left: -52px;
-        }
-    </style>
+    <script src="js/knockout-3.2.0.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/app.js" defer="defer"></script>
 </head>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -49,9 +33,11 @@
                 <li><a href="index.html">主页</a></li>
                 <li><a href="About.html">关于</a></li>
                 <li><a href="Contact.html">联系方式</a></li>
-                <li class="top-right"><a id="logout" onclick="logout()">退出</a></li>
             </ul>
-
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span data-bind="text: user"></span></a></li>
+                <li><a href="#" onclick="logout()">退出</a></li>
+            </ul>
         </div>
     </div>
 </div>
@@ -303,6 +289,7 @@
                 Comments: info.find("#comments").val(),
                 Lat: latlng.lat(),
                 Lng: latlng.lng(),
+                CreateDate: '2015-12-02 20:15:00',
                 UserId: 0
             };
 

@@ -22,3 +22,66 @@ select,
 textarea {
     max-width: 280px;
 }
+
+#floating-panel {
+    position: absolute;
+    top: 50px;
+    left: 1150px;
+    z-index: 5;
+    background-color: #fff;
+    padding: 5px;
+    border: 1px solid #999;
+    text-align: center;
+    font-family: 'Roboto', 'sans-serif';
+    line-height: 20px;
+    padding-left: 10px;
+}
+
+#floating-panel {
+    margin-left: -52px;
+}
+
+.mo-bg-image {
+    background-color: rgb(60,60,60);
+    background-image: url(../images/templatemo-bg-1.jpg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+.form-horizontal .control-label { margin-bottom: 10px; }
+
+.mo-login-form {
+    background-color: rgba(13,13,13,0.25);
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 300;
+    max-width: 650px;
+    padding: 0 30px 30px 30px;
+    margin: 30px auto 0 auto;
+}
+.mo-login-form h1 { color: #fff; margin-bottom: 40px; }
+.mo-login-form a { color: #DBDBDB; }
+.mo-login-form .form-control {
+    background-color: rgba(83, 78, 78, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.27);
+    color: rgb(255,255,255);
+}
+.mo-login-form .mo-input-icon-container .fa {	color: rgb(190, 190, 190); }
+.mo-login-form .control-label { margin-bottom: 10px; }
+.mo-login-form .btn {	width: 100%; }
+.mo-login-form .btn-social { max-width: 220px; }
+.mo-login-form label { font-weight: 400; }
+
+.mo-input-icon-container { position: relative; }
+.mo-input-icon-container .fa {
+    color: gray;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.mo-input-icon-container input,
+.mo-input-icon-container textarea {
+    padding-left: 30px;
+}
