@@ -61,6 +61,16 @@ textarea {
     padding: 0 30px 30px 30px;
     margin: 30px auto 0 auto;
 }
+
+.mo-form {
+    background-color: rgba(13,13,13,0.25);
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 300;
+    padding: 0 30px 30px 30px;
+    margin: 30px auto 0 auto;
+}
+
 .mo-login-form h1 { color: #fff; margin-bottom: 40px; }
 .mo-login-form a { color: #DBDBDB; }
 .mo-login-form .form-control {

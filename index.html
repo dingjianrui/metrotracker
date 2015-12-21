@@ -15,7 +15,8 @@
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
     <script src="js/knockout-3.2.0.js"></script>
     <script src="js/jquery.cookie.js"></script>
-    <script src="js/app.js" defer="defer"></script>
+    <!--<script src="js/app.js" defer="defer"></script>-->
+    <script src="js/mapApi.js" defer="defer"></script>
 </head>
 <body>
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -50,26 +51,48 @@
         <div id="capture"></div>
     </div>
     <hr/>
+    <div class="row">
+        <div class="table">
+            <table class="table-bordered">
+                <thead>
+                <tr>
+                    <td>线路序号</td>
+                    <td>线路起点坐标(经度，纬度)</td>
+                    <td>已完成长度</td>
+                    <td>完成天数</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><span id="StartPoint">120.2031049251, 31.5951298752</span></td>
+                    <td><input type="text" id="FinishedDistance" value="0.00"> 米</td>
+                    <td><input type="text" id="WorkDays" value="0"> 天</td>
+                </tr>
+                </tbody>
+            </table>
+            <input class="bottom-right right" type="button" id="btnSave" value="保存" onclick="saveProgress()">
+        </div>
+    </div>
 </div>
 <script>
     var map;
     var markers = [];
+    var progressCoordinates = [];
+    var progressPath;
     var src = 'http://wuxi.azurewebsites.net/line3.kml';
     var tagIndex = 0;
     var apiurl = 'http://securedwebapi.azurewebsites.net/';
     //apiurl = 'http://localhost:3790/Api/';
-
-    //* Initializes the map and calls the function that creates polylines.
     var tokenKey = 'accessToken';
     var headers = {};
-    function initialize() {
+    var LineTask;
 
+    // Initializes the map and calls the function that creates polylines.
+    function initialize() {
         var token = sessionStorage.getItem(tokenKey);
         if (token) {
             headers.Authorization = 'Bearer ' + token;
-        }
-        else {
-            window.location.href = "login.html";
         }
 
         map = new google.maps.Map(document.getElementById('googleMap'), {
@@ -78,281 +101,36 @@
             mapTypeId: google.maps.MapTypeId.TERRAIN
         });
 
-        markers = [];
-
         loadKmlLayer(src, map);
 
+        loadLineTask();
+
+        loadProgressLine(map);
+
+        markers = [];
+        loadPlacemarks(map);
         // This event listener calls addMarker() when the map is clicked.
         google.maps.event.addListener(map, 'click', function (event) {
             addMarker(event.latLng, map);
         });
-
-        loadPlacemarks(map);
     }
 
-    function logout(){
-        sessionStorage.removeItem(tokenKey);
-        window.location.href = "login.html";
-    }
-
-    function loadKmlLayer(src, map) {
-        var kmlLayer = new google.maps.KmlLayer(src, {
-            //suppressInfoWindows: true,
-            preserveViewport: true,
-            map: map
-        });
-        //google.maps.event.addListener(kmlLayer, 'click', function(event) {
-        //  var content = event.featureData.infoWindowHtml;
-        //  var testimonial = document.getElementById('capture');
-        //  testimonial.innerHTML = content;
-        //});
-    }
-
-    function loadPlacemarks(map) {
-        $.ajax({
-            url: apiurl + "/Api/Tags",
-            type: "GET",
-            dataType: "json",
-            headers: headers,
-            //crossDomain: true,
-            //data: "{}",
-            cache: false,
-            success: function (data) {
-                $.each(data, function (key, item) {
-                    var latlng = {lat: item.Lat, lng: item.Lng};
-                    loadMarker(latlng, map, item.Id, item.Name, item.Comments);
-                });
-            },
-            error: function (e) {
-                alert("not good" + JSON.stringify(e));
-            }
-        });
-    }
-
-    // loads a marker to the map.
-    function loadMarker(location, map, id, name, comments) {
-        // load the marker from stored location, and add the information label
-        // from the comment.
-        var marker = new google.maps.Marker({
-            position: location,
-            label: name,
-            title: comments,
-            map: map
-        });
-
-        marker.set("id", id);
-
-        var html = "<table id=" + id + ">" +
-                "<tr><td>Name:</td> <td><input type='text' id='name' value='" + name + "'/></td> </tr>" +
-                "<tr><td>Comments:</td> <td><input type='text' id='comments' value='" + comments + "'/></td> </tr>" +
-                "<tr><td></td><td><input id='Save' type='button' value='Save & Close'/> <input id='Delete' type='button' value='Delete'/></td></tr>";
-
-        marker.info = new google.maps.InfoWindow({
-            content: html
-        });
-
-        google.maps.event.addListener(marker, 'click', function () {
-            marker.info.open(map, marker);
-
-            $("#" + id).find("#Save").click(function () {
-                $("#" + id).find("#Save").unbind();
-                UpdateMarker(marker, id);
-            });
-
-            $("#" + id).find("#Delete").click(function () {
-                $("#" + id).find("#Delete").unbind();
-                RemoveMarker(marker, id);
-            });
-        });
-
-        markers.push(marker);
-    }
-
-    function addMarker(location, map) {
-        // Add the marker at the clicked location, and add the next-available label
-        // from the array of alphabetical characters.
-        var marker = new google.maps.Marker({
-            position: location,
-            map: map
-        });
-
-        var tagId = "T" + (tagIndex++).toString();// start with "T" means a temp Id for new tag by click
-
-        marker.set("id", tagId);
-
-        var html = "<table id='" + tagId + "'>" +
-                "<tr><td>Name:</td> <td><input type='text' id='name'/> </td> </tr>" +
-                "<tr><td>Comments:</td> <td><input type='text' id='comments'/></td> </tr>" +
-                    /*"<tr><td>Type:</td> <td><select id='type'>" +
-                     "<option value='start' SELECTED>start</option>" +
-                     "<option value='point'>point</option>" +
-                     "<option value='end'>end</option>" +
-                     "</select> </td></tr>" +*/
-                "<tr><td></td><td><input id='Save' type='button' value='Save & Close'/> <input id='Delete' type='button' value='Delete'/></td></tr>";
-
-        marker.info = new google.maps.InfoWindow({
-            content: html
-        });
-
-        google.maps.event.addListener(marker, 'click', function () {
-            marker.info.open(map, marker);
-
-            $("#" + tagId).find("#Save").click(function () {
-                $("#" + tagId).find("#Save").unbind();
-                SaveMarker(marker, tagId);
-            });
-
-            $("#" + tagId).find("#Delete").click(function () {
-                $("#" + tagId).find("#Delete").unbind();
-                RemoveMarker(marker, tagId);
-            });
-        });
-
-        markers.push(marker);
-
-        google.maps.event.trigger(marker, "click");
-    }
-
-    function ReBindMarkerClick(marker, name, comments) {
-        google.maps.event.clearListeners(marker, 'click');
-        var tagId = marker.get("id");
-        var html = "<table id=" + tagId + ">" +
-                "<tr><td>Name:</td> <td><input type='text' id='name' value='" + name + "'/></td> </tr>" +
-                "<tr><td>Comments:</td> <td><input type='text' id='comments' value='" + comments + "'/></td> </tr>" +
-                "<tr><td></td><td><input id='Save' type='button' value='Save & Close'/> <input id='Delete' type='button' value='Delete'/></td></tr>";
-
-        marker.info = new google.maps.InfoWindow({
-            content: html
-        });
-
-        google.maps.event.addListener(marker, 'click', function () {
-            marker.info.open(map, marker);
-            $("#" + tagId).find("#Save").click(function () {
-                $("#" + tagId).find("#Save").unbind();
-                UpdateMarker(marker, tagId);
-            });
-
-            $("#" + tagId).find("#Delete").click(function () {
-                $("#" + tagId).find("#Delete").unbind();
-                RemoveMarker(marker, tagId);
-            });
-        });
-    }
-
-    function getContentString(label, comment) {
-        var contentString = '';
-        return contentString;
-    }
-
-    function UpdateMarker(marker, tagId) {
-        var info = $("#" + tagId);
-        var latlng = marker.position;
-        var tag = {
-            Id: tagId,
-            Name: info.find("#name").val(),
-            Comments: info.find("#comments").val(),
-            Lat: latlng.lat(),
-            Lng: latlng.lng(),
-            UserId: 0,
-            CreateDate: "2015-11-29T11:06:37.763"
-        };
-
-
-        $.ajax({
-            url: apiurl + '/Api/Tags/' + tagId,
-            type: 'PUT',
-            data: JSON.stringify(tag),
-            contentType: 'application/json',
-            headers: headers,
-            success: function (data) {
-                alert("更新成功");
-                marker.setLabel(tag.Name);
-                marker.setTitle(tag.Comments);
-                marker.info.close();
-            },
-            error: function (e) {
-                alert("not good" + JSON.stringify(e));
-            }
-        });
-    }
-
-    function SaveMarker(marker, tagId) {
-        var id = marker.get("id");
-        if (id != null && $.isNumeric(id)) {
-            UpdateMarker(marker, id);
+    $(function(){
+        //var tokenKey = 'accessToken';
+        var token = sessionStorage.getItem(tokenKey);
+        if (token) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyCHuA90OFkUy6mQWu0qrksacZgahmy4zG8&signed_in=true&callback=initialize";
+            document.body.appendChild(script);
         }
         else {
-            var info = $("#" + tagId);
-            var latlng = marker.position;
-            var tag = {
-                Name: info.find("#name").val(),
-                Comments: info.find("#comments").val(),
-                Lat: latlng.lat(),
-                Lng: latlng.lng(),
-                CreateDate: '2015-12-02 20:15:00',
-                UserId: 0
-            };
-
-            $.ajax({
-                url: apiurl + '/Api/Tags',
-                type: 'POST',
-                data: JSON.stringify(tag),
-                headers: headers,
-                contentType: 'application/json',
-                success: function (data) {
-                    alert("添加成功");
-                    marker.set("id", data.Id);
-                    marker.setLabel(tag.Name);
-                    marker.setTitle(tag.Comments);
-                    marker.info.close();
-                    ReBindMarkerClick(marker, tag.Name, tag.Comments);
-                    //infowindow.close();
-                },
-                error: function (e) {
-                    alert("not good" + JSON.stringify(e));
-                }
-            });
+            window.location.href = "login.html";
         }
-    }
+    });
 
-    function RemoveMarker(marker, tagId) {
-        var id = marker.get("id");
-        if (id == null) {
-            id = tagId;
-        }
-
-        var idx = $.map(markers, function (obj, index) {
-            if (obj.id == id) {
-                return index;
-            }
-        })[0];
-
-        marker.info.close();
-        markers[idx].setMap(null);
-        marker = null;
-
-        if (id != null && $.isNumeric(id)) {
-            $.ajax({
-                url: apiurl + '/Api/Tags/' + id,
-                type: 'DELETE',
-                headers: headers,
-                success: function (data) {
-                    alert("删除成功");
-                },
-                error: function (e) {
-                    alert("not good" + JSON.stringify(e));
-                }
-            });
-        }
-    }
-
-    function reset() {
-        map.setCenter(new google.maps.LatLng(31.546941, 120.331878));
-        map.setZoom(12);
-    }
 
     //google.maps.event.addDomListener(window, 'load', initialize);
 </script>
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCHuA90OFkUy6mQWu0qrksacZgahmy4zG8&signed_in=true&callback=initialize"></script>
 </body>
 </html>
