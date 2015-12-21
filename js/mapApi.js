@@ -234,7 +234,6 @@ function UpdateMarker(marker, tagId) {
         contentType: 'application/json',
         headers: headers,
         success: function (data) {
-            alert("更新成功");
             marker.setLabel(tag.Name);
             marker.setTitle(tag.Comments);
             marker.info.close();
@@ -269,7 +268,6 @@ function SaveMarker(marker, tagId) {
             headers: headers,
             contentType: 'application/json',
             success: function (data) {
-                alert("添加成功");
                 marker.set("id", data.Id);
                 marker.setLabel(tag.Name);
                 marker.setTitle(tag.Comments);
@@ -306,7 +304,6 @@ function RemoveMarker(marker, tagId) {
             type: 'DELETE',
             headers: headers,
             success: function (data) {
-                alert("删除成功");
             },
             error: function (e) {
                 alert("not good" + JSON.stringify(e));
