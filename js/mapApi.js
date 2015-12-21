@@ -92,6 +92,7 @@ function loadLineTask() {
         //data: "{}",
         cache: false,
         success: function (data) {
+            $('#btnAdd').hide();
             LineTask = data;
             $('#FinishedDistance').val(data.FinishedDistance);
             $('#WorkDays').val(data.WorkDays);

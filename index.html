@@ -47,7 +47,7 @@
         <div id="floating-panel">
             <button id="reset" onclick="reset()">回到中心</button>
         </div>
-        <div id="googleMap" style="width:100%;height:550px;"></div>
+        <div id="googleMap" style="width:100%;height:500px;"></div>
         <div id="capture"></div>
     </div>
     <hr/>
@@ -59,7 +59,7 @@
                     <td>线路序号</td>
                     <td>线路起点坐标(经度，纬度)</td>
                     <td>已完成长度</td>
-                    <td>完成天数</td>
+                    <td colspan="2">完成天数</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,11 +68,11 @@
                     <td><span id="StartPoint">120.2031049251, 31.5951298752</span></td>
                     <td><input type="text" id="FinishedDistance" value="0.00"> 米</td>
                     <td><input type="text" id="WorkDays" value="0"> 天</td>
+                    <td><input class="bottom-right right" type="button" id="btnAdd" value="添加" onclick="addProgress()">
+                        <input class="bottom-right right" type="button" id="btnSave" value="保存" onclick="saveProgress()"></td>
                 </tr>
                 </tbody>
             </table>
-            <input class="bottom-right right" type="button" id="btnAdd" value="添加" onclick="addProgress()">
-            <input class="bottom-right right" type="button" id="btnSave" value="保存" onclick="saveProgress()">
         </div>
     </div>
 </div>
