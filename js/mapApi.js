@@ -314,6 +314,35 @@ function RemoveMarker(marker, tagId) {
     }
 }
 
+function addProgress() {
+    var LineTask = {
+        Id: 1,
+        StartLat: 31.5951298752,
+        StartLng: 120.2031049251,
+        FinishedDistance: $("#FinishedDistance").val(),
+        WorkDays: $("#WorkDays").val(),
+        StartedOn: "2015-12-21T00:23:10.9941944+00:00",
+        CreatedBy: 1,
+        CreatedOn: "2015-12-21T00:23:10.9941944+00:00",
+        ModifiedBy: 1,
+        ModifiedOn: "2015-12-21T00:23:10.9941944+00:00"
+    };
+
+    $.ajax({
+        url: apiurl + '/Api/LineTasks',
+        type: 'POST',
+        data: JSON.stringify(LineTask),
+        headers: headers,
+        contentType: 'application/json',
+        success: function (data) {
+            loadProgressLine(map);
+        },
+        error: function (e) {
+            alert("not good" + JSON.stringify(e));
+        }
+    });
+}
+
 function saveProgress() {
     var LineTask = {
         Id: 1,
@@ -330,7 +359,6 @@ function saveProgress() {
 
     $.ajax({
         url: apiurl + '/Api/LineTasks/' + LineTask.Id,
-        //url: apiurl + '/Api/LineTasks',
         type: 'PUT',
         data: JSON.stringify(LineTask),
         headers: headers,
